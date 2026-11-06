@@ -10,7 +10,7 @@ Marker-based WebAR (A-Frame + AR.js). Point the camera at the **Hiro marker** to
 | Marker scene (5+ objects, many shapes, text) | plane, spheres, rings, box (moon), rocket, `<a-text>` |
 | Animation (rotation + position) | planets + moon orbit (rotation), rocket floats (position) |
 | 3D model (not the duck) | `rocket.glb` |
-| Interaction | tap **Earth** = colour change, tap **Sun** = grow / shrink (bottom buttons do the same) |
+| Interaction | tap **Earth: colour** button = earth colour change, tap **Sun: grow/shrink** button = sun grow / shrink |
 | Status banner | green = marker found, red = marker lost |
 | Hosting | HTTPS (see below) |
 
