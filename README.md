@@ -42,4 +42,39 @@ SolarSystemAR/
 ├── index.html
 ├── README.md
 └── rocket.glb
-```
+---
+
+## How to Get and Use the Hiro Marker
+
+The Solar System only appears when the camera can see the **Hiro marker**.
+
+### Download the marker
+
+- Official Hiro marker (recommended):  
+  https://raw.githubusercontent.com/AR-js-org/AR.js/master/data/images/HIRO.jpg
+
+- Alternative version (PNG):  
+  https://raw.githubusercontent.com/AR-js-org/AR.js/master/data/images/hiro.png
+
+### How to print it
+
+1. Open one of the links above.
+2. Print it on normal A4 or Letter paper (black & white is fine).
+3. Make the printed marker at least 10–15 cm wide.
+4. Keep the paper flat.
+
+### How to use it
+
+1. Open the project on your phone using an **HTTPS** link.
+2. Allow camera access when asked.
+3. Hold the printed Hiro marker in front of the camera.
+4. Wait 1–2 seconds — the Solar System should appear on the marker.
+
+### Tips for best results
+
+- Use good lighting and avoid strong shadows on the marker.
+- Keep the marker flat and fully visible to the camera.
+- If the scene disappears, slowly move the marker back into view.
+- Hold the phone steady for better tracking.
+
+---
