@@ -88,7 +88,8 @@
         init: function () {
           const banner = document.querySelector("#status");
           this.el.addEventListener("markerFound", () => {
-            banner.textContent = "Marker FOUND - tap the buttons below to change the size of the sun and the colour of Earth!";
+            banner.textContent =
+              "Marker FOUND - tap the buttons below to change the size of the sun and the colour of Earth!";
             banner.style.background = "#2E7D32";
           });
           this.el.addEventListener("markerLost", () => {
@@ -202,15 +203,15 @@
         <!-- space (black plate) -->
         <a-plane
           rotation="-90 0 0"
-          width="1.6"
-          height="1.6"
+          width="2.8"
+          height="1.8"
           color="black"
         ></a-plane>
 
         <!-- title -->
         <a-text
           value="Solar System"
-          position="0 1.2 0"
+          position="-0.5 1.2 0"
           align="center"
           width="3"
           color="white"
@@ -221,7 +222,7 @@
           id="sun-sphere"
           class="clickable"
           grow-toggle
-          position="0 0.3 0"
+          position="-0.5 0.3 0"
           radius="0.18"
           color="yellow"
           material="shader: flat"
@@ -229,7 +230,7 @@
 
         <!-- orbit lines (Static objects configured for zero CPU matrix updates) -->
         <a-ring
-          position="0 0.3 0"
+          position="-0.5 0.3 0"
           rotation="-90 0 0"
           radius-inner="0.295"
           radius-outer="0.305"
@@ -237,7 +238,7 @@
           matrixAutoUpdate="false"
         ></a-ring>
         <a-ring
-          position="0 0.3 0"
+          position="-0.5 0.3 0"
           rotation="-90 0 0"
           radius-inner="0.435"
           radius-outer="0.445"
@@ -245,7 +246,7 @@
           matrixAutoUpdate="false"
         ></a-ring>
         <a-ring
-          position="0 0.3 0"
+          position="-0.5 0.3 0"
           rotation="-90 0 0"
           radius-inner="0.575"
           radius-outer="0.585"
@@ -253,7 +254,7 @@
           matrixAutoUpdate="false"
         ></a-ring>
         <a-ring
-          position="0 0.3 0"
+          position="-0.5 0.3 0"
           rotation="-90 0 0"
           radius-inner="0.715"
           radius-outer="0.725"
@@ -263,19 +264,19 @@
 
         <!-- mercury: white, fast -->
 
-        <a-entity orbit="speed: 3.5" position="0 0.3 0">
+        <a-entity orbit="speed: 3.5" position="-0.5 0.3 0">
           <a-sphere position="0.3 0 0" radius="0.05" color="white"></a-sphere>
         </a-entity>
 
         <!-- venus: pink -->
 
-        <a-entity orbit="speed: 2.7" position="0 0.3 0">
+        <a-entity orbit="speed: 2.7" position="-0.5 0.3 0">
           <a-sphere position="0.44 0 0" radius="0.07" color="pink"></a-sphere>
         </a-entity>
 
         <!-- earth: blue (tap: colour) -->
 
-        <a-entity orbit="speed: 2.1" position="0 0.3 0">
+        <a-entity orbit="speed: 2.1" position="-0.5 0.3 0">
           <a-sphere
             id="earth-sphere"
             class="clickable"
@@ -288,11 +289,19 @@
 
         <!-- mars: red -->
 
-        <a-entity orbit="speed: 1.7" position="0 0.3 0">
+        <a-entity orbit="speed: 1.7" position="-0.5 0.3 0">
           <a-sphere position="0.72 0 0" radius="0.07" color="red"></a-sphere>
         </a-entity>
 
         <!-- rocket (glb), floats up and down -->
+        <a-entity
+          position="1.0 0.4 0"
+          rotation="0 -90 0"
+          scale="0.32 0.32 0.32"
+          animation="property: position; dir: alternate; dur: 1800; loop: true; to: 1.0 0.75 0"
+        >
+          <a-entity gltf-model="#rocket-model"></a-entity>
+        </a-entity>
       </a-marker>
 
       <a-entity camera></a-entity>
