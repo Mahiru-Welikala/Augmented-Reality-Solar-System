@@ -1,8 +1,8 @@
 # Solar System AR
 
-Marker-based WebAR (A-Frame + AR.js). Point the camera at the **Hiro marker** to see the sun, 4 planets, a moon and a rocket.
+Marker-based WebAR (A-Frame + AR.js). Point the camera at the **Hiro marker** to see the sun, 4 planets and a rocket.
 
-**Live link:** _paste your Netlify / GitHub Pages link here_
+link to view: https://augment-reality-solar-system.netlify.app/
 
 ## What is in it
 | Task | Where |
@@ -15,8 +15,8 @@ Marker-based WebAR (A-Frame + AR.js). Point the camera at the **Hiro marker** to
 | Hosting | HTTPS (see below) |
 
 ## Components (own code)
-- `color-changer` - tap Earth, next colour
-- `grow-toggle` - tap Sun, grow / shrink
+- `color-changer` - tap Earth button, colour changes of Earth
+- `grow-toggle` - tap Sun button, the Sun will grow / shrink
 - `marker-status` - banner text + colour
 
 ## Model credit
@@ -33,8 +33,7 @@ Marker-based WebAR (A-Frame + AR.js). Point the camera at the **Hiro marker** to
 3. Phone needs HTTPS (camera is blocked on plain http), so test the hosted link
 
 ## Host (HTTPS)
-- Netlify Drop: drag the whole folder to app.netlify.com/drop
-- or GitHub Pages: Settings > Pages > main branch
+- [https://augment-reality-solar-system.netlify.app/]
 
 ## Files
 ```
