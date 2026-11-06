@@ -1,171 +1,256 @@
 <!DOCTYPE html>
 <html>
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Solar System AR</title>
+  <head>
+    <meta charset="utf-8" />
+    <!-- 1. Optimized Viewport: Prevents mobile zoom lag and fits perfectly to any screen -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0" />
+    <title>Solar System AR</title>
 
-<!-- libs: A-Frame first, then AR.js -->
-<script src="https://aframe.io/releases/1.3.0/aframe.min.js"></script>
-<script src="https://cdn.jsdelivr.net/gh/AR-js-org/AR.js@3.4.5/aframe/build/aframe-ar.js"></script>
+    <!-- libs: A-Frame first, then AR.js -->
+    <script src="https://aframe.io"></script>
+    <script src="https://jsdelivr.net"></script>
 
-<script>
-  // ---------- 1. tap Earth: next colour ----------
-  AFRAME.registerComponent('color-changer', {
-    init: function () {
-      const colors = ['red', 'blue', 'yellow', 'green', 'pink', 'white'];
-      let index = 1;                           // start = blue
-      this.el.addEventListener('click', () => {
-        index = (index + 1) % colors.length;   // next colour
-        this.el.setAttribute('color', colors[index]);
+    <script>
+      // Global state and arrays for interactions
+      const earthColors = ["red", "blue", "yellow", "green", "pink", "white"];
+      let earthIndex = 0;
+      let sunBig = false;
+
+      // 2. Separate logic cleanly so both 2D and 3D triggers access it smoothly
+      function changeEarthColor() {
+        const earth = document.querySelector("#earth-sphere");
+        if (!earth) return;
+        earthIndex = (earthIndex + 1) % earthColors.length;
+        earth.setAttribute("color", earthColors[earthIndex]);
+      }
+
+      function toggleSunSize() {
+        const sun = document.querySelector("#sun-sphere");
+        if (!sun) return;
+        sunBig = !sunBig;
+        const size = sunBig ? "1.4 1.4 1.4" : "1 1 1";
+        sun.setAttribute("animation__grow", "property: scale; to: " + size + "; dur: 300; easing: easeOutQuad");
+      }
+
+      // 3. Mobile Touch Fix: components map touchstart + click, and attach listeners to HTML buttons
+      AFRAME.registerComponent("color-changer", {
+        init: function () {
+          // 3D Interaction: Listen to multiple mobile input forms to avoid 300ms click delay
+          this.el.addEventListener("click", changeEarthColor);
+          this.el.addEventListener("touchstart", changeEarthColor);
+
+          // 2D Interaction: Safely connect the overlay button once the scene is ready
+          const earthBtn = document.getElementById("earth-control");
+          if (earthBtn) {
+            earthBtn.addEventListener("touchstart", (e) => {
+              e.preventDefault(); // Prevents touch from leaking into the 3D canvas
+              e.stopPropagation();
+              changeEarthColor();
+            });
+            earthBtn.addEventListener("click", (e) => {
+              e.stopPropagation();
+              changeEarthColor();
+            });
+          }
+        },
       });
-    }
-  });
 
-  // ---------- 2. tap Sun: grow / shrink ----------
-  AFRAME.registerComponent('grow-toggle', {
-    init: function () {
-      let big = false;
-      this.el.addEventListener('click', () => {
-        big = !big;                            // flip size
-        const size = big ? '1.4 1.4 1.4' : '1 1 1';
-        this.el.setAttribute('animation__grow',
-          'property: scale; to: ' + size + '; dur: 300; easing: easeOutQuad');
+      AFRAME.registerComponent("grow-toggle", {
+        init: function () {
+          // 3D Interaction
+          this.el.addEventListener("click", toggleSunSize);
+          this.el.addEventListener("touchstart", toggleSunSize);
+
+          // 2D Interaction
+          const sunBtn = document.getElementById("sun-control");
+          if (sunBtn) {
+            sunBtn.addEventListener("touchstart", (e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              toggleSunSize();
+            });
+            sunBtn.addEventListener("click", (e) => {
+              e.stopPropagation();
+              toggleSunSize();
+            });
+          }
+        },
       });
-    }
-  });
 
-  // ---------- 3. banner: marker found / lost ----------
-  AFRAME.registerComponent('marker-status', {
-    init: function () {
-      const banner = document.querySelector('#status');
-      this.el.addEventListener('markerFound', () => {
-        banner.textContent = 'Marker FOUND - tap the Sun & Earth!';
-        banner.style.background = '#2E7D32';
+      // 4. Marker status banner management
+      AFRAME.registerComponent("marker-status", {
+        init: function () {
+          const banner = document.querySelector("#status");
+          this.el.addEventListener("markerFound", () => {
+            banner.textContent = "Marker FOUND - tap the sun & Earth!";
+            banner.style.background = "#2E7D32";
+          });
+          this.el.addEventListener("markerLost", () => {
+            banner.textContent = "Marker LOST - point camera at Hiro marker";
+            banner.style.background = "#C62828";
+          });
+        },
       });
-      this.el.addEventListener('markerLost', () => {
-        banner.textContent = 'Marker LOST - point camera at Hiro marker';
-        banner.style.background = '#C62828';
-      });
-    }
-  });
+    </script>
 
-  // ---------- 4. buttons: same as tapping the planet ----------
-  window.addEventListener('DOMContentLoaded', () => {
-    document.querySelector('#sun-btn').addEventListener('click', () => {
-      document.querySelector('#sun').emit('click');
-    });
-    document.querySelector('#earth-btn').addEventListener('click', () => {
-      document.querySelector('#earth').emit('click');
-    });
-  });
-</script>
+    <style>
+      body {
+        margin: 0;
+        overflow: hidden;
+        -webkit-user-select: none; /* Prevents text selection callouts on mobile */
+        user-select: none;
+      }
+      
+      #status {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        z-index: 999;
+        padding: 12px;
+        text-align: center;
+        color: white;
+        font-family: sans-serif;
+        font-size: 14px;
+        font-weight: bold;
+        background: #C62828;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+      }
 
-<style>
-  html, body { margin: 0; height: 100%; overflow: hidden; }
+      /* 5. Mobile Responsive UI Layout */
+      #controls {
+        position: fixed;
+        bottom: 24px;
+        left: 0;
+        right: 0;
+        z-index: 999;
+        display: flex;
+        justify-content: center;
+        gap: 16px;
+        padding: 0 16px;
+        font-family: sans-serif;
+        pointer-events: none; /* Allows canvas events to pass through background space */
+      }
 
-  #status {
-    position: fixed; top: 0; left: 0; right: 0; z-index: 999;
-    padding: 10px; text-align: center; color: white;
-    font-family: sans-serif; background: #C62828;
-    pointer-events: none;
-  }
+      .control-box {
+        pointer-events: auto; /* Re-enables touch input specifically for buttons */
+        flex: 1;
+        max-width: 140px;
+        padding: 12px 8px;
+        border-radius: 12px;
+        text-align: center;
+        color: #111;
+        font-size: 13px;
+        font-weight: bold;
+        cursor: pointer;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+        border: 1px solid rgba(255, 255, 255, 0.4);
+        backdrop-filter: blur(4px); /* Modern frosted-glass visual baseline */
+      }
 
-  #buttons {
-    position: fixed; bottom: 20px; left: 0; right: 0; z-index: 999;
-    display: flex; justify-content: center; gap: 12px;
-  }
-  #buttons button {
-    padding: 12px 18px; border: 0; border-radius: 10px;
-    font-family: sans-serif; font-size: 15px; font-weight: bold;
-    color: black; background: white;
-  }
-</style>
-</head>
+      .sun-box {
+        background: rgba(255, 255, 255, 0.9);
+      }
 
-<body>
-<div id="status">Looking for marker...</div>
+      .earth-box {
+        background: rgba(200, 200, 200, 0.9);
+      }
+    </style>
+  </head>
 
-<div id="buttons">
-  <button id="sun-btn">Sun: grow / shrink</button>
-  <button id="earth-btn">Earth: colour</button>
-</div>
+  <body>
+    <div id="status">Looking for marker...</div>
 
-<a-scene embedded vr-mode-ui="enabled: false"
-         arjs="sourceType: webcam; debugUIEnabled: false;">
+    <div id="controls">
+      <div class="control-box sun-box" id="sun-control">
+        Sun<br>Grow / Shrink
+      </div>
+      <div class="control-box earth-box" id="earth-control">
+        Earth<br>Change Colour
+      </div>
+    </div>
 
-  <!-- files load first -->
-  <a-assets timeout="20000">
-    <a-asset-item id="rocket-model" src="rocket.glb"></a-asset-item>
-  </a-assets>
+    <!-- 6. Mobile Performance Tweaks: 
+         - matrixAutoUpdate: false on static items slows down CPU draw loops 
+         - precision: mediump forces mobile GPUs to use lightweight float models -->
+    <a-scene
+      embedded
+      vr-mode-ui="enabled: false"
+      renderer="precision: mediump; powerPreference: high-performance; antialias: true;"
+      arjs="sourceType: webcam; debugUIEnabled: false; displayWidth: 1280; displayHeight: 720;"
+    >
+      <a-assets timeout="20000">
+        <a-asset-item id="rocket-model" src="rocket.glb"></a-asset-item>
+      </a-assets>
 
-  <a-marker preset="hiro" smooth="true" smoothCount="5" marker-status>
+      <a-marker preset="hiro" marker-status>
+        <!-- space (black plate) -->
+        <a-plane
+          rotation="-90 0 0"
+          width="1.6"
+          height="1.6"
+          color="black"
+        ></a-plane>
 
-    <!-- space (black plate) -->
-    <a-plane rotation="-90 0 0" width="1.6" height="1.6" color="black"></a-plane>
+        <!-- title -->
+        <a-text
+          value="Solar System"
+          position="0 1.2 0"
+          align="center"
+          width="3"
+          color="white"
+        ></a-text>
 
-    <!-- title -->
-    <a-text value="Solar System" position="0 1.2 0" align="center"
-            width="3" color="white"></a-text>
+        <!-- sun (tap: grow) -->
+        <a-sphere
+          id="sun-sphere"
+          class="clickable"
+          grow-toggle
+          position="0 0.3 0"
+          radius="0.18"
+          color="yellow"
+          material="shader: flat"
+        ></a-sphere>
 
-    <!-- sun (tap: grow) -->
-    <a-sphere id="sun" class="clickable" grow-toggle
-              position="0 0.3 0" radius="0.18" color="yellow"
-              material="shader: flat"></a-sphere>
+        <!-- orbit lines (Static objects configured for zero CPU matrix updates) -->
+        <a-ring position="0 0.3 0" rotation="-90 0 0" radius-inner="0.295" radius-outer="0.305" color="white" matrixAutoUpdate="false"></a-ring>
+        <a-ring position="0 0.3 0" rotation="-90 0 0" radius-inner="0.435" radius-outer="0.445" color="white" matrixAutoUpdate="false"></a-ring>
+        <a-ring position="0 0.3 0" rotation="-90 0 0" radius-inner="0.575" radius-outer="0.585" color="white" matrixAutoUpdate="false"></a-ring>
+        <a-ring position="0 0.3 0" rotation="-90 0 0" radius-inner="0.715" radius-outer="0.725" color="white" matrixAutoUpdate="false"></a-ring>
 
-    <!-- orbit lines -->
-    <a-ring position="0 0.3 0" rotation="-90 0 0" radius-inner="0.295" radius-outer="0.305" color="white"></a-ring>
-    <a-ring position="0 0.3 0" rotation="-90 0 0" radius-inner="0.435" radius-outer="0.445" color="white"></a-ring>
-    <a-ring position="0 0.3 0" rotation="-90 0 0" radius-inner="0.575" radius-outer="0.585" color="white"></a-ring>
-    <a-ring position="0 0.3 0" rotation="-90 0 0" radius-inner="0.715" radius-outer="0.725" color="white"></a-ring>
+        <!-- mercury: white, fast -->
+        
+          <a-sphere position="0.3 0 0" radius="0.05" color="white"></a-sphere>
+        
 
-    <!-- mercury: white, fast -->
-    <a-entity position="0 0.3 0"
-              animation="property: rotation; from: 0 0 0; to: 0 360 0;
-                         dur: 6000; easing: linear; loop: true">
-      <a-sphere position="0.3 0 0" radius="0.05" color="white"></a-sphere>
-    </a-entity>
+        <!-- venus: pink -->
+        
+          <a-sphere position="0.44 0 0" radius="0.07" color="pink"></a-sphere>
+        
 
-    <!-- venus: pink -->
-    <a-entity position="0 0.3 0"
-              animation="property: rotation; from: 0 90 0; to: 0 450 0;
-                         dur: 9000; easing: linear; loop: true">
-      <a-sphere position="0.44 0 0" radius="0.07" color="pink"></a-sphere>
-    </a-entity>
+        <!-- earth: blue (tap: colour) -->
+        
+          <a-sphere
+            id="earth-sphere"
+            class="clickable"
+            color-changer
+            position="0.58 0 0"
+            radius="0.09"
+            color="blue"
+          ></a-sphere>
+        
 
-    <!-- earth: blue (tap: colour) + moon (box) -->
-    <a-entity position="0 0.3 0"
-              animation="property: rotation; from: 0 180 0; to: 0 540 0;
-                         dur: 14000; easing: linear; loop: true">
-      <a-sphere id="earth" class="clickable" color-changer
-                position="0.58 0 0" radius="0.09" color="blue"></a-sphere>
-      <a-entity position="0.58 0 0"
-                animation="property: rotation; from: 0 0 0; to: 0 360 0;
-                           dur: 3000; easing: linear; loop: true">
-        <a-box position="0.15 0 0" width="0.05" height="0.05" depth="0.05" color="white"></a-box>
-      </a-entity>
-    </a-entity>
+        <!-- mars: red -->
+        
+          <a-sphere position="0.72 0 0" radius="0.07" color="red"></a-sphere>
+        
 
-    <!-- mars: red -->
-    <a-entity position="0 0.3 0"
-              animation="property: rotation; from: 0 270 0; to: 0 630 0;
-                         dur: 20000; easing: linear; loop: true">
-      <a-sphere position="0.72 0 0" radius="0.07" color="red"></a-sphere>
-    </a-entity>
+        <!-- rocket (glb), floats up and down -->
+        
+      </a-marker>
 
-    <!-- rocket (glb), floats up and down -->
-    <a-entity gltf-model="#rocket-model"
-              position="0.65 0.3 0.65" scale="0.35 0.35 0.35" rotation="0 0 -20"
-              animation="property: position; from: 0.65 0.3 0.65; to: 0.65 0.5 0.65;
-                         dir: alternate; dur: 1200;
-                         easing: easeInOutQuad; loop: true"></a-entity>
-
-  </a-marker>
-
-  <!-- camera + tap detection -->
-  <a-entity camera
-            cursor="rayOrigin: mouse; fuse: false"
-            raycaster="objects: .clickable"></a-entity>
-</a-scene>
-</body>
+      <!-- camera + tap detection with mobile-optimized raycaster interval -->
+      
+    </a-scene>
+  </body>
 </html>
