@@ -10,30 +10,34 @@
 <script src="https://cdn.jsdelivr.net/gh/AR-js-org/AR.js@3.4.5/aframe/build/aframe-ar.js"></script>
 
 <script>
-  // ---------- 1. Earth button: next colour ----------
+  // ---------- 1. tap Earth or Earth button: next colour ----------
   AFRAME.registerComponent('color-changer', {
     schema: { button: { type: 'selector' } },
     init: function () {
       const colors = ['blue', 'red', 'yellow', 'green', 'pink', 'white'];
       let index = 0;
-      this.data.button.addEventListener('click', () => {
+      const change = () => {
         index = (index + 1) % colors.length;   // next colour
         this.el.setAttribute('color', colors[index]);
-      });
+      };
+      this.el.addEventListener('click', change);        // tap planet
+      this.data.button.addEventListener('click', change); // tap button
     }
   });
 
-  // ---------- 2. Sun button: grow / shrink ----------
+  // ---------- 2. tap Sun or Sun button: grow / shrink ----------
   AFRAME.registerComponent('grow-toggle', {
     schema: { button: { type: 'selector' } },
     init: function () {
       let big = false;
-      this.data.button.addEventListener('click', () => {
+      const toggle = () => {
         big = !big;                            // flip size
         const size = big ? '1.5 1.5 1.5' : '1 1 1';
         this.el.setAttribute('animation__grow',
           'property: scale; to: ' + size + '; dur: 300; easing: easeOutQuad');
-      });
+      };
+      this.el.addEventListener('click', toggle);        // tap planet
+      this.data.button.addEventListener('click', toggle); // tap button
     }
   });
 
@@ -42,7 +46,7 @@
     init: function () {
       const banner = document.querySelector('#status');
       this.el.addEventListener('markerFound', () => {
-        banner.textContent = 'Marker FOUND - use the buttons below';
+        banner.textContent = 'Marker FOUND - tap the Sun or Earth';
         banner.style.background = '#2E7D32';
       });
       this.el.addEventListener('markerLost', () => {
@@ -108,8 +112,8 @@
     <!-- solar system (centre of all orbits) -->
     <a-entity position="-0.5 0.3 0">
 
-      <!-- sun (button: grow) -->
-      <a-sphere grow-toggle="button: #sun-btn"
+      <!-- sun (tap: grow) -->
+      <a-sphere class="clickable" grow-toggle="button: #sun-btn"
                 radius="0.18" color="yellow"
                 material="shader: flat"></a-sphere>
 
@@ -131,11 +135,11 @@
         <a-sphere position="0.44 0 0" radius="0.07" color="pink"></a-sphere>
       </a-entity>
 
-      <!-- earth: blue (button: colour) + moon (white box) -->
+      <!-- earth: blue (tap: colour) + moon (white box) -->
       <a-entity animation="property: rotation; from: 0 180 0; to: 0 540 0;
                            dur: 14000; easing: linear; loop: true">
-        <a-sphere color-changer="button: #earth-btn"
-                  position="0.58 0 0" radius="0.09" color="blue"></a-sphere>
+        <a-sphere class="clickable" color-changer="button: #earth-btn"
+                  position="0.58 0 0" radius="0.1" color="blue"></a-sphere>
         <a-entity position="0.58 0 0"
                   animation="property: rotation; from: 0 0 0; to: 0 360 0;
                              dur: 3000; easing: linear; loop: true">
@@ -160,7 +164,10 @@
 
   </a-marker>
 
-  <a-entity camera></a-entity>
+  <!-- camera + tap detection -->
+  <a-entity camera
+            cursor="rayOrigin: mouse; fuse: false"
+            raycaster="objects: .clickable"></a-entity>
 </a-scene>
 </body>
 </html>
