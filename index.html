@@ -85,6 +85,36 @@
       obj.lookAt(this.pos);                                 // turn to camera
     }
   });
+
+  // ---------- 5. tap area: tap near a planet = tap the planet ----------
+  AFRAME.registerComponent('tap-area', {
+    schema: {
+      targets: { type: 'selectorAll' },        // planets that can be tapped
+      radius: { default: 50 }                  // finger size (px)
+    },
+    init: function () {
+      const pos = new AFRAME.THREE.Vector3();
+      window.addEventListener('click', (e) => {
+        if (e.target.closest && e.target.closest('button')) return;  // buttons work alone
+        const cam = this.el.sceneEl.camera;
+        const box = this.el.sceneEl.canvas.getBoundingClientRect();
+        let best = null;
+        let bestDist = this.data.radius;
+        this.data.targets.forEach((el) => {
+          for (let o = el.object3D; o; o = o.parent) {
+            if (!o.visible) return;            // marker lost = no tap
+          }
+          el.object3D.getWorldPosition(pos).project(cam);
+          if (pos.z > 1) return;               // behind camera
+          const x = box.left + (pos.x + 1) / 2 * box.width;
+          const y = box.top + (1 - pos.y) / 2 * box.height;
+          const dist = Math.hypot(e.clientX - x, e.clientY - y);
+          if (dist < bestDist) { best = el; bestDist = dist; }   // nearest wins
+        });
+        if (best) best.emit('click');
+      });
+    }
+  });
 </script>
 
 <style>
@@ -133,55 +163,47 @@
   <a-marker preset="hiro" smooth="true" smoothCount="5" marker-status>
 
     <!-- space (black plate) -->
-    <a-plane rotation="-90 0 0" width="2.8" height="1.8" color="black"></a-plane>
+    <a-plane rotation="-90 0 0" width="3.1" height="2" color="black"></a-plane>
 
     <!-- title (black sign so it is easy to read) -->
-    <a-entity position="-0.5 1.1 -1" screen-label>
+    <a-entity position="-0.55 1.1 -1" screen-label>
       <a-plane width="1.5" height="0.32" color="black"></a-plane>
       <a-text value="Solar System" position="0 0 0.01" align="center"
               width="4" color="white"></a-text>
     </a-entity>
 
     <!-- solar system (centre of all orbits) -->
-    <a-entity position="-0.5 0.3 0">
+    <a-entity position="-0.55 0.3 0">
 
       <!-- sun (tap: grow) -->
       <a-sphere id="sun" grow-toggle="button: #sun-btn"
                 radius="0.18" color="yellow"
-                material="shader: flat">
-        <!-- big invisible tap area (easier to tap) -->
-        <a-sphere class="clickable" radius="0.3"
-                  material="opacity: 0; transparent: true; depthWrite: false"></a-sphere>
-      </a-sphere>
+                material="shader: flat"></a-sphere>
 
       <!-- orbit lines -->
-      <a-ring rotation="-90 0 0" radius-inner="0.295" radius-outer="0.305" color="white"></a-ring>
-      <a-ring rotation="-90 0 0" radius-inner="0.435" radius-outer="0.445" color="white"></a-ring>
-      <a-ring rotation="-90 0 0" radius-inner="0.575" radius-outer="0.585" color="white"></a-ring>
-      <a-ring rotation="-90 0 0" radius-inner="0.715" radius-outer="0.725" color="white"></a-ring>
+      <a-ring rotation="-90 0 0" radius-inner="0.375" radius-outer="0.385" color="white"></a-ring>
+      <a-ring rotation="-90 0 0" radius-inner="0.535" radius-outer="0.545" color="white"></a-ring>
+      <a-ring rotation="-90 0 0" radius-inner="0.695" radius-outer="0.705" color="white"></a-ring>
+      <a-ring rotation="-90 0 0" radius-inner="0.855" radius-outer="0.865" color="white"></a-ring>
 
       <!-- mercury: white, fast -->
       <a-entity animation="property: rotation; from: 0 0 0; to: 0 360 0;
                            dur: 6000; easing: linear; loop: true">
-        <a-sphere position="0.3 0 0" radius="0.05" color="white"></a-sphere>
+        <a-sphere position="0.38 0 0" radius="0.05" color="white"></a-sphere>
       </a-entity>
 
       <!-- venus: pink -->
       <a-entity animation="property: rotation; from: 0 90 0; to: 0 450 0;
                            dur: 9000; easing: linear; loop: true">
-        <a-sphere position="0.44 0 0" radius="0.07" color="pink"></a-sphere>
+        <a-sphere position="0.54 0 0" radius="0.07" color="pink"></a-sphere>
       </a-entity>
 
       <!-- earth: blue (tap: colour) + moon (white box) -->
       <a-entity animation="property: rotation; from: 0 180 0; to: 0 540 0;
                            dur: 14000; easing: linear; loop: true">
         <a-sphere id="earth" color-changer="button: #earth-btn"
-                  position="0.58 0 0" radius="0.1" color="blue">
-          <!-- big invisible tap area (easier to tap) -->
-          <a-sphere class="clickable" radius="0.26"
-                    material="opacity: 0; transparent: true; depthWrite: false"></a-sphere>
-        </a-sphere>
-        <a-entity position="0.58 0 0"
+                  position="0.7 0 0" radius="0.1" color="blue"></a-sphere>
+        <a-entity position="0.7 0 0"
                   animation="property: rotation; from: 0 0 0; to: 0 360 0;
                              dur: 3000; easing: linear; loop: true">
           <a-box position="0.15 0 0" width="0.05" height="0.05" depth="0.05" color="white"></a-box>
@@ -191,7 +213,7 @@
       <!-- mars: red -->
       <a-entity animation="property: rotation; from: 0 270 0; to: 0 630 0;
                            dur: 21000; easing: linear; loop: true">
-        <a-sphere position="0.72 0 0" radius="0.07" color="red"></a-sphere>
+        <a-sphere position="0.86 0 0" radius="0.07" color="red"></a-sphere>
       </a-entity>
 
     </a-entity>
@@ -210,17 +232,15 @@
 
     <!-- rocket (glb), floats up and down -->
     <a-entity gltf-model="#rocket-model"
-              position="1 0.4 0" rotation="0 -90 0" scale="0.4 0.4 0.4"
-              animation="property: position; from: 1 0.4 0; to: 1 0.75 0;
+              position="1.1 0.4 0" rotation="0 -90 0" scale="0.4 0.4 0.4"
+              animation="property: position; from: 1.1 0.4 0; to: 1.1 0.75 0;
                          dir: alternate; dur: 1800;
                          easing: easeInOutQuad; loop: true"></a-entity>
 
   </a-marker>
 
   <!-- camera + tap detection -->
-  <a-entity camera
-            cursor="rayOrigin: mouse; fuse: false"
-            raycaster="objects: .clickable"></a-entity>
+  <a-entity camera tap-area="targets: #sun, #earth; radius: 50"></a-entity>
 </a-scene>
 </body>
 </html>
