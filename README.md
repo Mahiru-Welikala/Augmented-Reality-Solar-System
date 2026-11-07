@@ -7,7 +7,7 @@ Marker-based WebAR (A-Frame + AR.js). Point the camera at the **Hiro marker** to
 ## What is in it
 | Task | Where |
 |---|---|
-| Marker scene (5+ objects, many shapes, text) | plane, spheres, rings, box (moon), rocket, `<a-text>` (title + Earth label) |
+| Marker scene (5+ objects, many shapes, text) | plane, spheres, rings, box (moon), rocket, `<a-text>` (title + Sun and Earth labels) |
 | Animation (rotation + position) | planets + moon orbit (rotation), rocket floats (position) |
 | 3D model (not the duck) | `rocket.glb` |
 | Interaction | tap **Earth** = change colour, tap **Sun** = grow / shrink (bottom buttons do the same) |
@@ -18,7 +18,7 @@ Marker-based WebAR (A-Frame + AR.js). Point the camera at the **Hiro marker** to
 - `color-changer` - tap Earth (or its button), next colour
 - `grow-toggle` - tap Sun (or its button), grow / shrink
 - `marker-status` - banner text + colour
-- `face-camera` - title and Earth label always turn to the camera
+- `screen-label` - title, Sun and Earth labels face the camera (planet labels sit above their planet)
 
 ## Model credit
 - `rocket.glb` - made by our group (built with Python + trimesh).
