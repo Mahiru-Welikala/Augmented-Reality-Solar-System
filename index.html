@@ -146,9 +146,13 @@
     <a-entity position="-0.5 0.3 0">
 
       <!-- sun (tap: grow) -->
-      <a-sphere id="sun" class="clickable" grow-toggle="button: #sun-btn"
+      <a-sphere id="sun" grow-toggle="button: #sun-btn"
                 radius="0.18" color="yellow"
-                material="shader: flat"></a-sphere>
+                material="shader: flat">
+        <!-- big invisible tap area (easier to tap) -->
+        <a-sphere class="clickable" radius="0.3"
+                  material="opacity: 0; transparent: true; depthWrite: false"></a-sphere>
+      </a-sphere>
 
       <!-- orbit lines -->
       <a-ring rotation="-90 0 0" radius-inner="0.295" radius-outer="0.305" color="white"></a-ring>
@@ -174,7 +178,7 @@
         <a-sphere id="earth" color-changer="button: #earth-btn"
                   position="0.58 0 0" radius="0.1" color="blue">
           <!-- big invisible tap area (easier to tap) -->
-          <a-sphere class="clickable" radius="0.22"
+          <a-sphere class="clickable" radius="0.26"
                     material="opacity: 0; transparent: true; depthWrite: false"></a-sphere>
         </a-sphere>
         <a-entity position="0.58 0 0"
