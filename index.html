@@ -55,6 +55,19 @@
       });
     }
   });
+
+  // ---------- 4. labels always face the camera ----------
+  AFRAME.registerComponent('face-camera', {
+    init: function () {
+      this.target = new AFRAME.THREE.Vector3();
+    },
+    tick: function () {
+      const cam = this.el.sceneEl.camera;
+      if (!cam) return;
+      cam.getWorldPosition(this.target);
+      this.el.object3D.lookAt(this.target);    // turn to camera
+    }
+  });
 </script>
 
 <style>
@@ -105,9 +118,12 @@
     <!-- space (black plate) -->
     <a-plane rotation="-90 0 0" width="2.8" height="1.8" color="black"></a-plane>
 
-    <!-- title -->
-    <a-text value="Solar System" position="-0.5 1 0" align="center"
-            width="3" color="white"></a-text>
+    <!-- title (black sign so it is easy to read) -->
+    <a-entity position="-0.5 1 0" face-camera>
+      <a-plane width="1.5" height="0.32" color="black"></a-plane>
+      <a-text value="Solar System" position="0 0 0.01" align="center"
+              width="4" color="white"></a-text>
+    </a-entity>
 
     <!-- solar system (centre of all orbits) -->
     <a-entity position="-0.5 0.3 0">
@@ -135,7 +151,7 @@
         <a-sphere position="0.44 0 0" radius="0.07" color="pink"></a-sphere>
       </a-entity>
 
-      <!-- earth: blue (tap: colour) + moon (white box) -->
+      <!-- earth: blue (tap: colour) + label + moon (white box) -->
       <a-entity animation="property: rotation; from: 0 180 0; to: 0 540 0;
                            dur: 14000; easing: linear; loop: true">
         <a-sphere color-changer="button: #earth-btn"
@@ -144,6 +160,11 @@
           <a-sphere class="clickable" radius="0.22"
                     material="opacity: 0; transparent: true; depthWrite: false"></a-sphere>
         </a-sphere>
+        <a-entity position="0.58 0.24 0" face-camera>
+          <a-plane width="0.36" height="0.13" color="black"></a-plane>
+          <a-text value="EARTH" position="0 0 0.01" align="center"
+                  width="1.7" color="white"></a-text>
+        </a-entity>
         <a-entity position="0.58 0 0"
                   animation="property: rotation; from: 0 0 0; to: 0 360 0;
                              dur: 3000; easing: linear; loop: true">
