@@ -18,6 +18,7 @@ Marker-based WebAR (A-Frame + AR.js). Point the camera at the **Hiro marker** to
 - `color-changer` - tap Earth (or its button), next colour
 - `grow-toggle` - tap Sun (or its button), grow / shrink
 - `marker-status` - banner text + colour
+- `tap-area` - tap near the Sun or Earth on screen counts as tapping it
 - `screen-label` - title, Sun and Earth labels face the camera (planet labels sit above their planet)
 
 ## Model credit
