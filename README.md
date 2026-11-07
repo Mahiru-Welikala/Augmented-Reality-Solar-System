@@ -10,13 +10,13 @@ Marker-based WebAR (A-Frame + AR.js). Point the camera at the **Hiro marker** to
 | Marker scene (5+ objects, many shapes, text) | plane, spheres, rings, box (moon), rocket, `<a-text>` |
 | Animation (rotation + position) | planets + moon orbit (rotation), rocket floats (position) |
 | 3D model (not the duck) | `rocket.glb` |
-| Interaction | **Sun** button = grow / shrink, **Earth** button = change colour |
+| Interaction | tap **Earth** = change colour, tap **Sun** = grow / shrink (bottom buttons do the same) |
 | Status banner | green = marker found, red = marker lost |
 | Hosting | HTTPS (Netlify) |
 
 ## Components (own code)
-- `color-changer` - Earth button, next colour
-- `grow-toggle` - Sun button, grow / shrink
+- `color-changer` - tap Earth (or its button), next colour
+- `grow-toggle` - tap Sun (or its button), grow / shrink
 - `marker-status` - banner text + colour
 
 ## Model credit
@@ -56,4 +56,4 @@ The scene only shows when the camera sees the Hiro marker.
 1. Open the live link on your phone.
 2. Allow camera.
 3. Show the marker, wait 1-2 seconds.
-4. Use the Sun and Earth buttons at the bottom.
+4. Tap the Sun or Earth, or use the buttons at the bottom.
